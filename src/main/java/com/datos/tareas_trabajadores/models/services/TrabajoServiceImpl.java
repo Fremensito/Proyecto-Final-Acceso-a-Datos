@@ -17,4 +17,9 @@ public class TrabajoServiceImpl implements ITrabajoService{
     public void save(Trabajo trabajo){
         trabajoDAO.save(trabajo);
     }
+
+    @Override
+    public Trabajo getLast(){
+        return trabajoDAO.getLast();
+    }
 }

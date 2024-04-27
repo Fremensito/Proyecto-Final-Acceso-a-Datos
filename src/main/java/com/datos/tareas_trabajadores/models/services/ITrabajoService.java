@@ -8,4 +8,6 @@ public interface ITrabajoService {
     //public List<Trabajo> findAll();
 
     public void save(Trabajo trabajo);
+
+    public Trabajo getLast();
 }

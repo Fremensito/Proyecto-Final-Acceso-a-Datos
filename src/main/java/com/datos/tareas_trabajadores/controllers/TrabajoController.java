@@ -19,4 +19,10 @@ public class TrabajoController {
         trabajoService.save(trabajo);
         return trabajo;
     }
+
+    @GetMapping("/last")
+    @ResponseStatus(HttpStatus.OK)
+    public Trabajo findLast(){
+        return trabajoService.getLast();
+    }
 }

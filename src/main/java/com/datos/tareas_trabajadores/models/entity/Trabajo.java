@@ -3,6 +3,7 @@ package com.datos.tareas_trabajadores.models.entity;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.Date;
 
 @Entity
@@ -20,14 +21,14 @@ public class Trabajo implements Serializable {
 
     @Column(name="fec_ini", nullable = false)
     @Temporal(TemporalType.DATE)
-    private Date fecIni;
+    private LocalDate fecIni;
 
     @Column(name="fec_fin")
     @Temporal(TemporalType.DATE)
-    private Date fecFin;
+    private LocalDate fecFin;
 
     @Column(columnDefinition = "NUMERIC(4,1)")
-    private int tiempo;
+    private float tiempo;
 
     /*@ManyToOne
     @JoinColumn(name="trabajador")
@@ -58,27 +59,27 @@ public class Trabajo implements Serializable {
         this.descripcion = descripcion;
     }
 
-    public Date getFecIni() {
+    public LocalDate getFecIni() {
         return fecIni;
     }
 
-    public void setFecIni(Date fecIni) {
+    public void setFecIni(LocalDate fecIni) {
         this.fecIni = fecIni;
     }
 
-    public Date getFecFin() {
+    public LocalDate getFecFin() {
         return fecFin;
     }
 
-    public void setFecFin(Date fecFin) {
+    public void setFecFin(LocalDate fecFin) {
         this.fecFin = fecFin;
     }
 
-    public int getTiempo() {
+    public float getTiempo() {
         return tiempo;
     }
 
-    public void setTiempo(int tiempo) {
+    public void setTiempo(float tiempo) {
         this.tiempo = tiempo;
     }
 
