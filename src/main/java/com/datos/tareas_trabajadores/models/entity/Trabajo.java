@@ -12,8 +12,8 @@ import java.util.Date;
 @Table(name="trabajo")
 public class Trabajo implements Serializable {
     @Id
-    @Pattern(regexp = "t-[1-9](?:[0-9][0-9])?", message = "necesario id tipo t-numero")
-    @Column(length = 5, nullable = false, name="cod_trabajo")
+    //@Pattern(regexp = "t-[1-9](?:[0-9][0-9])?", message = "necesario id tipo t-numero")
+    //@Column(nullable = false)
     private String codTrabajo;
 
     @Size(min=1, max=50, message="longitud de campo no válida")

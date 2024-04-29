@@ -31,7 +31,18 @@ public class TrabajoController {
 
             return new ResponseEntity<Map<String, Object>>(response, HttpStatus.CONFLICT);
         }
+
+        //Registro del trabajo
         try {
+            Trabajo ultimoTrabajo = trabajoService.getLast();
+            if(ultimoTrabajo == null)
+                trabajo.setCodTrabajo("t-1");
+            else{
+                String[] cod_spliteado = ultimoTrabajo.getCodTrabajo().split("-");
+                trabajo.setCodTrabajo(cod_spliteado[0] +
+                        "-" +
+                        String.valueOf(Integer.parseInt(cod_spliteado[1])+ 1));
+            }
             trabajoService.save(trabajo);
             response.put("result", "ok");
             response.put("trabajo", trabajo);
@@ -39,7 +50,7 @@ public class TrabajoController {
         }
         catch(Exception e){
             response.put("result", "error");
-            response.put("causa", "internal server error");
+            response.put("causa", e.getMessage());
             return new ResponseEntity<Map<String, Object>>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
