@@ -1,6 +1,8 @@
 package com.datos.tareas_trabajadores.models.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 
 import java.io.Serializable;
 import java.time.LocalDate;
@@ -10,9 +12,11 @@ import java.util.Date;
 @Table(name="trabajo")
 public class Trabajo implements Serializable {
     @Id
+    @Pattern(regexp = "t-[1-9](?:[0-9][0-9])?", message = "necesario id tipo t-numero")
     @Column(length = 5, nullable = false, name="cod_trabajo")
     private String codTrabajo;
 
+    @Size(min=1, max=50, message="longitud de campo no válida")
     @Column(length = 50, nullable = false)
     private String categoria;
 
