@@ -9,6 +9,6 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_DB: tareas_trabajadores
     volumes:
-      - ./my-data:/var/lib/postgresql/data
+      - ../my-data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
