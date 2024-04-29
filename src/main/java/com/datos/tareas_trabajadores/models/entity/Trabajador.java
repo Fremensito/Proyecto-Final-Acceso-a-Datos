@@ -13,6 +13,4 @@ public class Trabajador implements Serializable {
     @Id
     @Column(length = 5)
     private String id_trabajador;
-
-    
 }
