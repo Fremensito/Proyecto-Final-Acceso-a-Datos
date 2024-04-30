@@ -1,12 +1,12 @@
 package com.datos.tareas_trabajadores.models.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.Size;
+
 
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.util.Date;
 
 @Entity
 @Table(name="trabajo")
@@ -20,9 +20,11 @@ public class Trabajo implements Serializable {
     @Column(length = 50, nullable = false)
     private String categoria;
 
+    @Size(min=1, max=500, message="longitud de campo no válida")
     @Column(length = 500, nullable = false)
     private String descripcion;
 
+    @FutureOrPresent(message = "tiene que ser un trabajo futuro")
     @Column(name="fec_ini", nullable = false)
     @Temporal(TemporalType.DATE)
     private LocalDate fecIni;

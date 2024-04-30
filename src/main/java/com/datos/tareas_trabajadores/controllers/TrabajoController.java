@@ -11,6 +11,10 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PathVariable;
+
 
 @RestController
 @RequestMapping("/trabajos")
@@ -24,12 +28,7 @@ public class TrabajoController {
         Map<String, Object> response = new HashMap<>();
 
         if(result.hasErrors()){
-            response.put("result", "error");
-            Map<String, String> errores = new HashMap<>();
-            result.getFieldErrors().forEach(e -> errores.put(e.getField(), e.getDefaultMessage()));
-            response.put("causa", errores);
-
-            return new ResponseEntity<Map<String, Object>>(response, HttpStatus.CONFLICT);
+            return validate(response, result);
         }
 
         //Registro del trabajo
@@ -61,11 +60,60 @@ public class TrabajoController {
         return trabajoService.getAll();
     }
 
-    @DeleteMapping("")
-    public ResponseEntity<?> delete(@RequestBody String id){
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getById(@PathVariable String id){
+        Map<String, Object> response = new HashMap<>();
+        Optional<Trabajo> trabajo = trabajoService.findById(id);
+
+        return getOrDelete(response, trabajo);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> putMethodName(@PathVariable String id, @Valid @RequestBody Trabajo trabajo, BindingResult result) {
+        Map<String, Object> response = new HashMap<>();
+        if(result.hasErrors())
+            return validate(response, result);
+        else{
+            Optional<Trabajo> db_trabajo = trabajoService.findById(id);
+            if(db_trabajo.isPresent()){
+                trabajo.setCodTrabajo(db_trabajo.get().getCodTrabajo());
+                trabajoService.save(trabajo);
+                response.put("result", "ok");
+                response.put("trabajo", trabajo);
+                return new ResponseEntity<Map<String, Object>>(response, HttpStatus.NOT_FOUND);
+            }
+            else{
+                response.put("result", "error");
+                response.put("causa", "trabajo no encontrado");
+                return new ResponseEntity<Map<String, Object>>(response, HttpStatus.NOT_FOUND);
+            }
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> delete(@PathVariable String id){
         Map<String, Object> response = new HashMap<>();
         Optional<Trabajo> trabajo = trabajoService.delete(id);
 
+        return getOrDelete(response, trabajo);
+    }
+
+    @GetMapping("/last")
+    @ResponseStatus(HttpStatus.OK)
+    public Trabajo findLast(){
+        return trabajoService.getLast();
+    }
+
+    private ResponseEntity<Map<String, Object>> validate(Map<String, Object> response, BindingResult result){
+        response.put("result", "error");
+        Map<String, String> errores = new HashMap<>();
+        result.getFieldErrors().forEach(e -> errores.put(e.getField(), e.getDefaultMessage()));
+        response.put("causa", errores);
+
+        return new ResponseEntity<Map<String, Object>>(response, HttpStatus.CONFLICT);
+    }
+
+    private ResponseEntity<Map<String, Object>> getOrDelete(Map<String, Object> response, Optional<Trabajo> trabajo){
         if(trabajo.isPresent()){
             response.put("result", "ok");
             response.put("trabajo", trabajo.get());
@@ -73,14 +121,8 @@ public class TrabajoController {
         }
         else {
             response.put("result", "error");
-            response.put("mensaje", "trabajo no encontrado");
+            response.put("causa", "trabajo no encontrado");
             return new ResponseEntity<Map<String, Object>>(response, HttpStatus.NOT_FOUND);
         }
-    }
-
-    @GetMapping("/last")
-    @ResponseStatus(HttpStatus.OK)
-    public Trabajo findLast(){
-        return trabajoService.getLast();
     }
 }

@@ -12,6 +12,8 @@ public interface ITrabajoService {
 
     public ArrayList<Trabajo> getAll();
 
+    public Optional<Trabajo> findById(String id);
+
     public Optional<Trabajo> delete(String id);
 
     public Trabajo getLast();
