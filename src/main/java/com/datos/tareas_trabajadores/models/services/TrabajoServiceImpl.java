@@ -3,6 +3,8 @@ package com.datos.tareas_trabajadores.models.services;
 import com.datos.tareas_trabajadores.models.dao.ITrabajoDAO;
 import com.datos.tareas_trabajadores.models.entity.Trabajo;
 import jakarta.transaction.Transactional;
+import jakarta.validation.OverridesAttribute;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -30,6 +32,12 @@ public class TrabajoServiceImpl implements ITrabajoService{
     }
 
     @Override
+    public Optional<Trabajo> findById(String id){
+        return trabajoDAO.findById(id);
+    }
+
+    @Override
+    @Transactional
     public Optional<Trabajo> delete(String id){
         Optional<Trabajo> t = trabajoDAO.findById(id);
         if(t.isPresent()){
