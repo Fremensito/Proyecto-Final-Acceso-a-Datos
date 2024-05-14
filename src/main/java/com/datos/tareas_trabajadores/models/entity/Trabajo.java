@@ -1,12 +1,15 @@
 package com.datos.tareas_trabajadores.models.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.FutureOrPresent;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;
+
 
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.util.Date;
 
 @Entity
 @Table(name="trabajo")
@@ -20,9 +23,11 @@ public class Trabajo implements Serializable {
     @Column(length = 50, nullable = false)
     private String categoria;
 
+    @Size(min=1, max=500, message="longitud de campo no válida")
     @Column(length = 500, nullable = false)
     private String descripcion;
 
+    @FutureOrPresent(message = "tiene que ser un trabajo futuro")
     @Column(name="fec_ini", nullable = false)
     @Temporal(TemporalType.DATE)
     private LocalDate fecIni;
@@ -34,10 +39,14 @@ public class Trabajo implements Serializable {
     @Column(columnDefinition = "NUMERIC(4,1)")
     private float tiempo;
 
-    /*@ManyToOne
+    @Min(value = 1, message = "prioridad mínima 1, prioridad máxima 4")
+    @Max(value= 4, message = "prioridad mínima 1, prioridad máxima 4")
+    private int prioridad;
+
+    @JsonIgnore
+    @ManyToOne
     @JoinColumn(name="trabajador")
-    @Column(name="id_trabajador")
-    private Trabajador trabajador;*/
+    private Trabajador trabajador;
 
     public String getCodTrabajo() {
         return codTrabajo;
@@ -87,11 +96,19 @@ public class Trabajo implements Serializable {
         this.tiempo = tiempo;
     }
 
-    /*public Trabajador getTrabajador() {
+    public int getPrioridad() {
+        return prioridad;
+    }
+
+    public void setPrioridad(int prioridad) {
+        this.prioridad = prioridad;
+    }
+
+    public Trabajador getTrabajador() {
         return trabajador;
     }
 
     public void setTrabajador(Trabajador trabajador) {
         this.trabajador = trabajador;
-    }*/
+    }
 }
