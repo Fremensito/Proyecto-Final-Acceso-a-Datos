@@ -3,12 +3,12 @@ package com.datos.tareas_trabajadores.models.services;
 import com.datos.tareas_trabajadores.models.dao.ITrabajoDAO;
 import com.datos.tareas_trabajadores.models.entity.Trabajo;
 import jakarta.transaction.Transactional;
-import jakarta.validation.OverridesAttribute;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -50,5 +50,20 @@ public class TrabajoServiceImpl implements ITrabajoService{
     @Override
     public Trabajo getLast(){
         return trabajoDAO.getLast();
+    }
+
+    @Override
+    public List<Trabajo> getTrabajosSinAsignar() {
+        return trabajoDAO.getTrabajosSinAsignar();
+    }
+
+    @Override
+    public List<Trabajo> getTrabajosFinalizados() {
+       return trabajoDAO.getTrabajosSinFinalizar();
+    }
+
+    @Override
+    public List<Trabajo> getTrabajosSinFinalizar() {
+        return trabajoDAO.getTrabajosFinalizados();
     }
 }
