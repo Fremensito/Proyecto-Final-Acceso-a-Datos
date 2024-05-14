@@ -87,7 +87,7 @@ public class TrabajoController {
 
     private ResponseEntity<?> mandarTrabajos(Map<String, Object> response, List<Trabajo> trabajos){
         response.put("result", "ok");
-        response.put("trabjos", trabajos);
+        response.put("trabajos", trabajos);
         return new ResponseEntity<Map<String, Object>>(response, HttpStatus.OK);
     }
 
