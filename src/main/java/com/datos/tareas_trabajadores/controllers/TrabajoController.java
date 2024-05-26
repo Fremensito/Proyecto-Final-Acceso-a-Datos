@@ -1,8 +1,11 @@
 package com.datos.tareas_trabajadores.controllers;
 
 
+import com.datos.tareas_trabajadores.models.entity.Trabajador;
 import com.datos.tareas_trabajadores.models.entity.Trabajo;
+import com.datos.tareas_trabajadores.models.services.ITrabajadorService;
 import com.datos.tareas_trabajadores.models.services.ITrabajoService;
+
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,6 +25,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 public class TrabajoController {
     @Autowired
     private ITrabajoService trabajoService;
+
+    @Autowired
+    private ITrabajadorService trabajadorService;
 
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
@@ -52,6 +58,38 @@ public class TrabajoController {
             response.put("result", "error");
             response.put("causa", e.getMessage());
             return new ResponseEntity<Map<String, Object>>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<?> createConTrabajador(@PathVariable String id, @Valid @RequestBody Trabajo trabajo, 
+        BindingResult result){
+        Map<String, Object> response = new HashMap<>();
+        if(result.hasErrors()){
+            return validate(response, result);
+        }
+
+        Optional<Trabajador> trabajador = trabajadorService.getById(id);
+
+        if(trabajador.isPresent()){
+            if(comprobarEspecialidad(trabajador.get(), trabajo)){
+                trabajo.setTrabajador(trabajador.get());
+                trabajoService.save(trabajo);
+                response.put("result", "ok");
+                response.put("trabajo", trabajo);
+                return new ResponseEntity<Map<String, Object>>(response, HttpStatus.CREATED);
+            }
+            else{
+                response.put("result", "error");
+                response.put("causa", "especialidad y categoría no coinciden");
+                return new ResponseEntity<Map<String, Object>>(response, HttpStatus.CONFLICT);
+            }
+        }
+        else{
+            response.put("result", "error");
+            response.put("causa", "trabajor no encontrado");
+            return new ResponseEntity<Map<String, Object>>(response, HttpStatus.NOT_FOUND);
         }
     }
 
@@ -87,7 +125,7 @@ public class TrabajoController {
 
     private ResponseEntity<?> mandarTrabajos(Map<String, Object> response, List<Trabajo> trabajos){
         response.put("result", "ok");
-        response.put("trabjos", trabajos);
+        response.put("trabajos", trabajos);
         return new ResponseEntity<Map<String, Object>>(response, HttpStatus.OK);
     }
 
@@ -95,22 +133,41 @@ public class TrabajoController {
     public ResponseEntity<?> getById(@PathVariable String id){
         Map<String, Object> response = new HashMap<>();
         Optional<Trabajo> trabajo = trabajoService.findById(id);
-
+        
         return getOrDelete(response, trabajo);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<?> putTrabajo(@PathVariable String id, @Valid @RequestBody Trabajo trabajo, BindingResult result) {
+
+    @PutMapping("asignar/{id_trabajo}/{id_trabajador}")
+    public ResponseEntity<?> asignarTrabajador(@PathVariable String id_trabajo, @PathVariable String id_trabajador){
         Map<String, Object> response = new HashMap<>();
-        if(result.hasErrors())
-            return validate(response, result);
+
+        Optional<Trabajo> trabajo = trabajoService.findById(id_trabajo);
+        Optional<Trabajador> trabajador = trabajadorService.getById(id_trabajador);
+
+        if(trabajo.isPresent() && trabajador.isPresent()){
+            if(trabajo.get().getCategoria() == trabajador.get().getEspecialidad()){
+                Trabajo update_trabajo = trabajo.get();
+                update_trabajo.setTrabajador(trabajador.get());
+                trabajoService.save(update_trabajo);
+                response.put("result", "ok");
+                response.put("trabajo", trabajo);
+                return new ResponseEntity<Map<String, Object>>(response, HttpStatus.CREATED);
+            }
+            else{
+                response.put("result", "error");
+                response.put("causa", "especialidad y categoría no coinciden");
+                return new ResponseEntity<Map<String, Object>>(response, HttpStatus.CONFLICT);
+            }
+        }
         else{
-            Optional<Trabajo> db_trabajo = trabajoService.findById(id);
-            return updateTrabajo(db_trabajo, trabajo, response, null);
+            response.put("result", "error");
+            response.put("causa", "no se han encontrado registros especificados");
+            return new ResponseEntity<Map<String, Object>>(response, HttpStatus.NOT_FOUND);
         }
     }
 
-    @PutMapping("/{id}/{fecha}")
+    @PutMapping("finalizar/{id}/{fecha}")
     public ResponseEntity<?> finalizarTrabajo(@PathVariable String id, @PathVariable String fecha){
         Map<String, Object> response = new HashMap<>();
         Optional<Trabajo> db_trabajo = trabajoService.findById(id);
@@ -122,6 +179,17 @@ public class TrabajoController {
             response.put("result", "error");
             response.put("causa", e.getMessage());
             return new ResponseEntity<Map<String, Object>>(response, HttpStatus.CONFLICT);
+        }
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> putTrabajo(@PathVariable String id, @Valid @RequestBody Trabajo trabajo, BindingResult result) {
+        Map<String, Object> response = new HashMap<>();
+        if(result.hasErrors())
+            return validate(response, result);
+        else{
+            Optional<Trabajo> db_trabajo = trabajoService.findById(id);
+            return updateTrabajo(db_trabajo, trabajo, response, null);
         }
     }
 
@@ -145,6 +213,13 @@ public class TrabajoController {
         response.put("causa", errores);
 
         return new ResponseEntity<Map<String, Object>>(response, HttpStatus.CONFLICT);
+    }
+
+    private boolean comprobarEspecialidad(Trabajador tr, Trabajo to){
+        if (tr.getEspecialidad() == to.getCategoria())
+            return true;
+        else
+            return false;
     }
 
     private ResponseEntity<Map<String, Object>> getOrDelete(Map<String, Object> response, Optional<Trabajo> trabajo){
