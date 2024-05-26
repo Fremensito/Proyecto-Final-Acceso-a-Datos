@@ -3,10 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <title>Nuevo Trabajo</title>
+    <link rel="stylesheet" href="/bootstrap.min.css">
 </head>
 <body>
     <h1>Nuevo Trabajo</h1>
-    <form th:object="${trabajo}" method="post">
+    <form th:object="${trabajo}" th:action="@{/web/trabajos/create}" method="post">
+        <p th:if="${#fields.hasErrors('*')}">
+            <span style="color: red">Name is required!</span>
+          </p>
         <div>
             <label for="categoria">Categoría: </label>
             <input type="text" th:field ="*{categoria}" minlength="1" maxlength="50" id="categoria">
@@ -16,7 +20,14 @@
             <textarea minlength="1" maxlength="500" th:field="*{descripcion}" id="descripcion"></textarea>
         </div>
         <div>
+            <label for="fec_ini">Inicio de Trabajo: </label>
+            <input type="date" id="fec_ini" th:field="*{fecIni}">
         </div>
+        <div>
+            <label for="prioridad">Prioridad: </label>
+            <input type=number id="prioridad" th:field="*{prioridad}" min="1" max="4">
+        </div>
+        <input type="submit" value="Enviar">
     </form>
 </body>
 </html>

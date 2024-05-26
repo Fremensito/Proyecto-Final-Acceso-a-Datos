@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 
@@ -28,6 +30,7 @@ public class Trabajo implements Serializable {
     private String descripcion;
 
     @FutureOrPresent(message = "tiene que ser un trabajo futuro")
+    @NotNull(message="campo obligatorio")
     @Column(name="fec_ini", nullable = false)
     @Temporal(TemporalType.DATE)
     private LocalDate fecIni;
